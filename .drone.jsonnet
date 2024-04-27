@@ -2,6 +2,7 @@ local name = 'peertube';
 local browser = 'firefox';
 local version = '6.0.4';
 local nginx = '1.24.0';
+local node = "20.9.0";
 local platform = '22.02';
 local selenium = '4.19.0-20240328';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
@@ -38,14 +39,14 @@ local build(arch, test_ui, dind) = [{
     },
     {
       name: 'peertube',
-      image: 'debian:buster-slim',
+      image: "node:" + node + "-alpine3.12",
       commands: [
         './peertube/build.sh ' + version,
       ],
     },
     {
       name: 'test peertube',
-      image: 'debian:buster-slim',
+      image: 'syncloud/platform-buster-' + arch + ':' + platform,
       commands: [
         './peertube/test.sh',
       ],
