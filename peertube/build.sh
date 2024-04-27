@@ -9,7 +9,7 @@ mkdir -p $BUILD_DIR/bin
 
 apt update
 apt install -y wget xz-utils
-
+npm install -g yarn
 cd ${DIR}/../build
 wget https://github.com/Chocobozzz/PeerTube/releases/download/v$VERSION/peertube-v$VERSION.tar.xz
 tar xf peertube-v$VERSION.tar.xz
