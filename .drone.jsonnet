@@ -2,6 +2,7 @@ local name = 'peertube';
 local browser = 'firefox';
 local version = '6.0.4';
 local nginx = '1.24.0';
+local platform = '22.02';
 local selenium = '4.19.0-20240328';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
 
@@ -25,7 +26,14 @@ local build(arch, test_ui, dind) = [{
       name: 'nginx',
       image: 'nginx:' + nginx,
       commands: [
-        './nginx/build.sh ' + nginx,
+        './nginx/build.sh',
+      ],
+    },
+    {
+      name: 'nginx test',
+      image: 'syncloud/platform-buster-' + arch + ':' + platform,
+      commands: [
+        './nginx/test.sh',
       ],
     },
     {
@@ -211,7 +219,7 @@ local build(arch, test_ui, dind) = [{
     },
     {
       name: name + '.buster.com',
-      image: 'syncloud/platform-buster-' + arch + ':22.02',
+      image: 'syncloud/platform-buster-' + arch + ':' + platform,
       privileged: true,
       volumes: [
         {
