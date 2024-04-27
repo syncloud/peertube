@@ -7,6 +7,7 @@ VERSION=$1
 BUILD_DIR=${DIR}/../build/snap/webui
 mkdir -p $BUILD_DIR/bin
 
+apt update
 apt install -y wget
 
 cd ${DIR}/../build
