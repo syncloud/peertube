@@ -39,7 +39,7 @@ local build(arch, test_ui, dind) = [{
     },
     {
       name: 'peertube',
-      image: "node:" + node + "-alpine3.12",
+      image: "node:" + node,
       commands: [
         './peertube/build.sh ' + version,
       ],
