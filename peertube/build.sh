@@ -4,7 +4,7 @@ DIR=$( cd "$( dirname "$0" )" && pwd )
 cd ${DIR}
 
 VERSION=$1
-BUILD_DIR=${DIR}/../build/snap/webui
+BUILD_DIR=${DIR}/../build/snap/peertube
 mkdir -p ${BUILD_DIR}
 apt update
 apt install -y wget xz-utils
