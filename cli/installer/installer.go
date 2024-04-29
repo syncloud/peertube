@@ -1,14 +1,11 @@
 package installer
 
 import (
-	"fmt"
-	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
 	"os"
 	"path"
-	"strings"
 )
 
 const (
@@ -23,9 +20,7 @@ type Installer struct {
 	currentVersionFile               string
 	configDir                        string
 	platformClient                   *platform.Client
-	autheliaStorageEncryptionKeyFile string
-	autheliaJwtSecretFile            string
-}
+	}
 
 func New() *Installer {
 	configDir := path.Join(DataDir, "config")
@@ -35,9 +30,7 @@ func New() *Installer {
 		currentVersionFile:               path.Join(DataDir, "version"),
 		configDir:                        configDir,
 		platformClient:                   platform.New(),
-		autheliaStorageEncryptionKeyFile: path.Join(DataDir, "authelia.storage.encryption.key"),
-		autheliaJwtSecretFile:            path.Join(DataDir, "authelia.jwt.secret"),
-	}
+			}
 }
 
 func (i *Installer) Install() error {
@@ -51,16 +44,7 @@ func (i *Installer) Install() error {
 		return err
 	}
 
-	err = os.WriteFile(i.autheliaStorageEncryptionKeyFile, []byte(uuid.New().String()), 0644)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(i.autheliaJwtSecretFile, []byte(uuid.New().String()), 0644)
-	if err != nil {
-		return err
-	}
-
+	
 	err = i.UpdateConfigs()
 	if err != nil {
 		return err
@@ -145,57 +129,8 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	domain, err := i.platformClient.GetAppDomainName(App)
-	if err != nil {
-		return err
-	}
-	appUrl, err := i.platformClient.GetAppDomainName(App)
-	if err != nil {
-		return err
-	}
-	encryptionKey, err := os.ReadFile(i.autheliaStorageEncryptionKeyFile)
-	if err != nil {
-		return err
-	}
-	jwtSecret, err := os.ReadFile(i.autheliaJwtSecretFile)
-	if err != nil {
-		return err
-	}
-	vars := map[string]string{
-		"domain":         domain,
-		"app_url":        appUrl,
-		"encryption_key": string(encryptionKey),
-		"jwt_secret":     string(jwtSecret),
-	}
+	return nil
 
-	err = i.InjectVariables(
-		path.Join(AppDir, "config", "authelia", "config.yml"),
-		path.Join(DataDir, "config", "authelia", "config.yml"),
-		vars,
-	)
-	if err != nil {
-		return err
-	}
-	err = i.InjectVariables(
-		path.Join(AppDir, "config", "authelia", "authrequest.conf"),
-		path.Join(DataDir, "config", "authelia", "authrequest.conf"),
-		vars,
-	)
-
-	return err
-
-}
-
-func (i *Installer) InjectVariables(from, to string, vars map[string]string) error {
-	templateFile, err := os.ReadFile(from)
-	if err != nil {
-		return err
-	}
-	template := string(templateFile)
-	for key, value := range vars {
-		template = strings.ReplaceAll(template, fmt.Sprintf("{{ %s }}", key), value)
-	}
-	return os.WriteFile(to, []byte(template), 0644)
 }
 
 func (i *Installer) FixPermissions() error {
