@@ -2,7 +2,7 @@
 
 retry=0
 retries=100
-APP=peerube
+APP=peertube
 NEXT=/snap/$APP/current/version
 CURRENT=/var/snap/$APP/current/version
 while ! diff $NEXT $CURRENT; do

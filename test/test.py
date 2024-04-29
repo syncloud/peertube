@@ -18,28 +18,28 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 @pytest.fixture(scope="session")
 def module_setup(request, device, app_dir, artifact_dir):
     def module_teardown():
-        device.run_ssh('ls -la /var/snap/peerube/current/config > {0}/config.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('cp /var/snap/peerube/current/config/webui.yaml {0}/webui.yaml.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('cp /var/snap/peerube/current/config/authelia/config.yml {0}/authelia.config.yml.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('cp /var/snap/peerube/current/config/authelia/authrequest.conf {0}/authelia.authrequest.conf.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/peertube/current/config > {0}/config.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cp /var/snap/peertube/current/config/webui.yaml {0}/webui.yaml.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cp /var/snap/peertube/current/config/authelia/config.yml {0}/authelia.config.yml.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cp /var/snap/peertube/current/config/authelia/authrequest.conf {0}/authelia.authrequest.conf.log'.format(TMP_DIR), throw=False)
         device.run_ssh('top -bn 1 -w 500 -c > {0}/top.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ps auxfw > {0}/ps.log'.format(TMP_DIR), throw=False)
         device.run_ssh('netstat -nlp > {0}/netstat.log'.format(TMP_DIR), throw=False)
         device.run_ssh('journalctl | tail -1000 > {0}/journalctl.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /snap > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /snap/peerube > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /snap/peertube > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /var/snap > {0}/var.snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/peerube > {0}/var.snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/peerube/current/ > {0}/var.snap.current.ls.log'.format(TMP_DIR),
+        device.run_ssh('ls -la /var/snap/peertube > {0}/var.snap.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/peertube/current/ > {0}/var.snap.current.ls.log'.format(TMP_DIR),
                        throw=False)
-        device.run_ssh('ls -la /var/snap/peerube/common > {0}/var.snap.common.ls.log'.format(TMP_DIR),
+        device.run_ssh('ls -la /var/snap/peertube/common > {0}/var.snap.common.ls.log'.format(TMP_DIR),
                        throw=False)
         device.run_ssh('ls -la /data > {0}/data.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /data/peerube > {0}/data.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /data/peertube > {0}/data.ls.log'.format(TMP_DIR), throw=False)
 
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
-        device.scp_from_device('/var/snap/peerube/common/log/*.log', app_log_dir)
+        device.scp_from_device('/var/snap/peertube/common/log/*.log', app_log_dir)
         device.scp_from_device('{0}/*'.format(TMP_DIR), app_log_dir)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
 
@@ -69,15 +69,15 @@ def __log_data_dir(device):
     device.run_ssh('ls -la /data')
     device.run_ssh('mount')
     device.run_ssh('ls -la /data/')
-    device.run_ssh('ls -la /data/peerube')
+    device.run_ssh('ls -la /data/peertube')
 
 
 def test_storage_change_event(device):
-    device.run_ssh('snap run peerube.storage-change > {0}/storage-change.log'.format(TMP_DIR))
+    device.run_ssh('snap run peertube.storage-change > {0}/storage-change.log'.format(TMP_DIR))
 
 
 def test_access_change_event(device):
-    device.run_ssh('snap run peerube.access-change > {0}/access-change.log'.format(TMP_DIR))
+    device.run_ssh('snap run peertube.access-change > {0}/access-change.log'.format(TMP_DIR))
 
 
 def test_remove(device, app):
