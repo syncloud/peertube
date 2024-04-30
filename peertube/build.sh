@@ -17,9 +17,10 @@ cd peertube-v$VERSION
 yarn install --production --pure-lockfile
 ls -la
 cd ..
-mv peertube-v$VERSION/distr ${BUILD_DIR}/distr
+mv peertube-v$VERSION/dist ${BUILD_DIR}/distr
 cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
 cp -r /bin ${BUILD_DIR}
 cp -r /lib ${BUILD_DIR}
 cp $DIR/bin/* ${BUILD_DIR}/bin
+
