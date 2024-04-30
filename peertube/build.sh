@@ -16,7 +16,7 @@ rm -rf peertube-v$VERSION.tar.xz
 cd peertube-v$VERSION
 yarn install --production --pure-lockfile
 cd ..
-mv peertube-v$VERSION ${BUILD_DIR}/peertube
+mv peertube-v$VERSION/distr ${BUILD_DIR}/distr
 cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
 cp -r /bin ${BUILD_DIR}
