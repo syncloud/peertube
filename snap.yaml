@@ -7,7 +7,7 @@ apps:
     - network
     - network-bind
     restart-condition: always
-  webui:
+  peertube:
     user: peertube
     command: bin/service.peertube.sh
     daemon: simple

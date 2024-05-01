@@ -2,5 +2,5 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 export PATH=$PATH:${DIR}/webui/bin
 cd ${DIR}/peertube
-exec bin/node dist/server
+exec bin/node.sh dist/server
 
