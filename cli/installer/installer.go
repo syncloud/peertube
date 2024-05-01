@@ -4,6 +4,8 @@ import (
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
+	"github.com/syncloud/golib/config"
+
 	"os"
 	"path"
 )
@@ -15,22 +17,27 @@ const (
 	CommonDir = "/var/snap/peertube/common"
 )
 
+type Variables struct {
+	Domain string
+	AppUrl string
+}
+
 type Installer struct {
-	newVersionFile                   string
-	currentVersionFile               string
-	configDir                        string
-	platformClient                   *platform.Client
-	}
+	newVersionFile     string
+	currentVersionFile string
+	configDir          string
+	platformClient     *platform.Client
+}
 
 func New() *Installer {
 	configDir := path.Join(DataDir, "config")
 
 	return &Installer{
-		newVersionFile:                   path.Join(AppDir, "version"),
-		currentVersionFile:               path.Join(DataDir, "version"),
-		configDir:                        configDir,
-		platformClient:                   platform.New(),
-			}
+		newVersionFile:     path.Join(AppDir, "version"),
+		currentVersionFile: path.Join(DataDir, "version"),
+		configDir:          configDir,
+		platformClient:     platform.New(),
+	}
 }
 
 func (i *Installer) Install() error {
@@ -44,7 +51,6 @@ func (i *Installer) Install() error {
 		return err
 	}
 
-	
 	err = i.UpdateConfigs()
 	if err != nil {
 		return err
@@ -124,7 +130,13 @@ func (i *Installer) UpdateVersion() error {
 
 func (i *Installer) UpdateConfigs() error {
 
-	err := cp.Copy(path.Join(AppDir, "config"), path.Join(DataDir, "config"))
+	variables := Variables{}
+
+	err := config.Generate(
+		path.Join(AppDir, "config"),
+		path.Join(DataDir, "config"),
+		variables,
+	)
 	if err != nil {
 		return err
 	}
