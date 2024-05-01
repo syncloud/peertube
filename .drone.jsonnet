@@ -1,6 +1,6 @@
 local name = 'peertube';
 local browser = 'firefox';
-local version = '6.0.4';
+local version = '6.1.0';
 local nginx = '1.24.0';
 local node = "18-bookworm-slim";
 local platform = '22.02';
@@ -39,9 +39,9 @@ local build(arch, test_ui, dind) = [{
     },
     {
       name: 'peertube',
-      image: "node:" + node,
+      image: "chocobozzz/peertube:v" + version + "-bookworm",
       commands: [
-        './peertube/build.sh ' + version,
+        './peertube/build.sh',
       ],
     },
     {
