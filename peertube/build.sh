@@ -5,6 +5,8 @@ cd ${DIR}
 
 BUILD_DIR=${DIR}/../build/snap/peertube
 mkdir -p ${BUILD_DIR}
+sed -i 's/server\.listen(port, hostname/server\.listen\(hostname/g' /app/dist/server.js
+sed -i 's#new transports.File.*#// no file#g' /app/dist/core/helpers/logger.js
 mv /app ${BUILD_DIR}/app
 cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
