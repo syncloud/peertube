@@ -5,6 +5,7 @@ cd ${DIR}
 
 BUILD_DIR=${DIR}/../build/snap/nginx
 mkdir -p ${BUILD_DIR}
+cp -r /etc ${BUILD_DIR}
 cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
 cp -r /bin ${BUILD_DIR}
