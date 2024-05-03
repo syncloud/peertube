@@ -1,10 +1,11 @@
 package installer
 
 import (
+	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
+	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
-	"github.com/syncloud/golib/config"
 
 	"os"
 	"path"
@@ -19,7 +20,7 @@ const (
 
 type Variables struct {
 	Domain string
-	AppUrl string
+	Secret string
 }
 
 type Installer struct {
@@ -130,9 +131,21 @@ func (i *Installer) UpdateVersion() error {
 
 func (i *Installer) UpdateConfigs() error {
 
-	variables := Variables{}
+	domain, err := i.platformClient.GetAppDomainName(App)
+	if err != nil {
+		return err
+	}
+	secret, err := getOrCreateUuid(path.Join(DataDir, "peertube.secret"))
+	if err != nil {
+		return err
+	}
 
-	err := config.Generate(
+	variables := Variables{
+		Domain: domain,
+		Secret: secret,
+	}
+
+	err = config.Generate(
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
 		variables,
@@ -155,4 +168,18 @@ func (i *Installer) FixPermissions() error {
 		return err
 	}
 	return nil
+}
+
+func getOrCreateUuid(file string) (string, error) {
+	_, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		secret := uuid.New().String()
+		err = os.WriteFile(file, []byte(secret), 0644)
+		return secret, err
+	}
+	content, err := os.ReadFile(file)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
 }
