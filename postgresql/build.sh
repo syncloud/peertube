@@ -24,5 +24,5 @@ PGBIN=$(echo ${BUILD_DIR}/usr/lib/postgresql/*/bin)
 mv $PGBIN/postgres $PGBIN/postgres.bin
 mv $PGBIN/pg_dump $PGBIN/pg_dump.bin
 
-cp $DIR/bin/* bin
+cp $DIR/bin/* ${BUILD_DIR}/bin
 cp $DIR/pgbin/* $PGBIN
