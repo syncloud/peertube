@@ -2,6 +2,7 @@ local name = 'peertube';
 local browser = 'firefox';
 local version = '6.1.0';
 local nginx = '1.24.0';
+local postgresql = "15-bullseye";
 local node = "18-bookworm-slim";
 local platform = '22.02';
 local selenium = '4.19.0-20240328';
@@ -23,6 +24,22 @@ local build(arch, test_ui, dind) = [{
         'echo $DRONE_BUILD_NUMBER > version',
       ],
     },
+  {
+            name: "postgresql",
+            image: "postgres:" + postgresql,
+            commands: [
+                "./postgresql/build.sh"
+            ]
+           
+        },
+        {
+            name: "postgresql test",
+            image: 'syncloud/platform-buster-' + arch + ':' + platform,
+            commands: [
+                "./postgresql/test.sh"
+            ]
+        },
+
     {
       name: 'nginx',
       image: 'nginx:' + nginx,
