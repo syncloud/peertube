@@ -26,7 +26,7 @@ func main() {
 
 	cmd.AddCommand(&cobra.Command{
 		Use: "access-change",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("access-change")
 			return installer.New(logger).AccessChange()
 		},
