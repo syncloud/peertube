@@ -15,6 +15,20 @@ apps:
     - network
     - network-bind
     restart-condition: always
+  postgresql:
+    user: peertube
+    command: bin/service.postgresql.sh
+    daemon: forking
+    plugs:
+      - network
+      - network-bind
+    restart-condition: always
+
+  psql:
+    command: bin/psql.sh
+
+  pgdumpall:
+    command: bin/pg_dumpall.sh
 
   storage-change:
     command: bin/cli storage-change

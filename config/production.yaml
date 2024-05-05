@@ -68,7 +68,7 @@ trust_proxy:
 
 # Your database name will be database.name OR 'peertube'+database.suffix
 database:
-  hostname: '127.0.0.1'
+  hostname: '/var/snap/peertube/current/database'
   port: 5432
   ssl: false
   suffix: '_prod'

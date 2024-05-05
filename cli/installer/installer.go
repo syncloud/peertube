@@ -1,11 +1,13 @@
 package installer
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
+	"go.uber.org/zap"
 
 	"os"
 	"path"
@@ -19,8 +21,9 @@ const (
 )
 
 type Variables struct {
-	Domain string
-	Secret string
+	Domain      string
+	Secret      string
+	DatabaseDir string
 }
 
 type Installer struct {
@@ -28,9 +31,12 @@ type Installer struct {
 	currentVersionFile string
 	configDir          string
 	platformClient     *platform.Client
+	database           *Database
+	installFile        string
+	logger             *zap.Logger
 }
 
-func New() *Installer {
+func New(logger *zap.Logger) *Installer {
 	configDir := path.Join(DataDir, "config")
 
 	return &Installer{
@@ -38,6 +44,9 @@ func New() *Installer {
 		currentVersionFile: path.Join(DataDir, "version"),
 		configDir:          configDir,
 		platformClient:     platform.New(),
+		database:           NewDatabase(AppDir, DataDir, configDir, App, logger),
+		installFile:        path.Join(CommonDir, "installed"),
+		logger:             logger,
 	}
 }
 
@@ -57,6 +66,15 @@ func (i *Installer) Install() error {
 		return err
 	}
 
+	err = i.database.Init()
+	if err != nil {
+		return err
+	}
+	err = i.database.InitConfig()
+	if err != nil {
+		return err
+	}
+
 	err = i.FixPermissions()
 	if err != nil {
 		return err
@@ -70,15 +88,82 @@ func (i *Installer) Install() error {
 }
 
 func (i *Installer) Configure() error {
+	_, err := os.Stat(i.installFile)
+	if os.IsNotExist(err) {
+		err := i.Initialize()
+		if err != nil {
+			return err
+		}
+	} else {
+		//upgrade
+	}
+	return nil
+}
+
+func (i *Installer) Initialize() error {
+	err := i.StorageChange()
+	if err != nil {
+		return err
+	}
+
+	err = i.database.Execute(
+		"postgres",
+		fmt.Sprintf("ALTER USER %s WITH PASSWORD '%s'", App, App),
+	)
+	if err != nil {
+		return err
+	}
+	err = i.database.createDbIfMissing(App)
+	if err != nil {
+		return err
+	}
+	err = i.database.Execute("postgres", fmt.Sprintf("GRANT CREATE ON SCHEMA public TO %s", App))
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(i.installFile, []byte("installed"), 0644)
+	if err != nil {
+		return err
+	}
+
+	return i.UpdateVersion()
+}
+
+func (i *Installer) Upgrade() error {
+	err := i.database.Restore()
+	if err != nil {
+		return err
+	}
+	err = i.StorageChange()
+	if err != nil {
+		return err
+	}
+	err = i.database.createDbIfMissing(App)
+	if err != nil {
+		return err
+	}
+
 	return i.UpdateVersion()
 }
 
 func (i *Installer) PreRefresh() error {
-	return nil
+	return i.database.Backup()
 }
 
 func (i *Installer) PostRefresh() error {
 	err := i.UpdateConfigs()
+	if err != nil {
+		return err
+	}
+	err = i.database.Remove()
+	if err != nil {
+		return err
+	}
+	err = i.database.Init()
+	if err != nil {
+		return err
+	}
+	err = i.database.InitConfig()
 	if err != nil {
 		return err
 	}
@@ -141,8 +226,9 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	variables := Variables{
-		Domain: domain,
-		Secret: secret,
+		Domain:      domain,
+		Secret:      secret,
+		DatabaseDir: i.database.DatabaseDir(),
 	}
 
 	err = config.Generate(
@@ -168,6 +254,18 @@ func (i *Installer) FixPermissions() error {
 		return err
 	}
 	return nil
+}
+
+func (i *Installer) BackupPreStop() error {
+	return i.PreRefresh()
+}
+
+func (i *Installer) RestorePreStart() error {
+	return i.PostRefresh()
+}
+
+func (i *Installer) RestorePostStart() error {
+	return i.Configure()
 }
 
 func getOrCreateUuid(file string) (string, error) {
