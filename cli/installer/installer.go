@@ -80,10 +80,6 @@ func (i *Installer) Install() error {
 		return err
 	}
 
-	err = i.StorageChange()
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -216,10 +212,16 @@ func (i *Installer) UpdateVersion() error {
 
 func (i *Installer) UpdateConfigs() error {
 
+	err := i.StorageChange()
+	if err != nil {
+		return err
+	}
+
 	domain, err := i.platformClient.GetAppDomainName(App)
 	if err != nil {
 		return err
 	}
+
 	secret, err := getOrCreateUuid(path.Join(DataDir, "peertube.secret"))
 	if err != nil {
 		return err
