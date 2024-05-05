@@ -3,6 +3,7 @@ local browser = 'firefox';
 local version = '6.1.0';
 local nginx = '1.24.0';
 local postgresql = "15-bullseye";
+local redis = "7.0.15";
 local node = "18-bookworm-slim";
 local platform = '22.02';
 local selenium = '4.19.0-20240328';
