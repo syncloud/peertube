@@ -11,14 +11,13 @@ import (
 )
 
 type Database struct {
-	appDir           string
-	dataDir          string
-	configPath       string
-	user             string
-	backupFile       string
-	databaseDir      string
-	postgresqlConfig string
-	logger           *zap.Logger
+	appDir      string
+	dataDir     string
+	configPath  string
+	user        string
+	backupFile  string
+	databaseDir string
+	logger      *zap.Logger
 }
 
 func NewDatabase(
@@ -29,14 +28,13 @@ func NewDatabase(
 	logger *zap.Logger,
 ) *Database {
 	return &Database{
-		appDir:           appDir,
-		dataDir:          dataDir,
-		configPath:       configPath,
-		user:             user,
-		backupFile:       path.Join(dataDir, "database.dump"),
-		databaseDir:      path.Join(dataDir, "database"),
-		postgresqlConfig: path.Join(configPath, "postgresql.conf"),
-		logger:           logger,
+		appDir:      appDir,
+		dataDir:     dataDir,
+		configPath:  configPath,
+		user:        user,
+		backupFile:  path.Join(dataDir, "database.dump"),
+		databaseDir: path.Join(dataDir, "database"),
+		logger:      logger,
 	}
 }
 
@@ -63,7 +61,10 @@ func (d *Database) Init() error {
 }
 
 func (d *Database) InitConfig() error {
-	return cp.Copy(d.postgresqlConfig, d.databaseDir)
+	return cp.Copy(
+		path.Join(d.configPath, "postgresql.conf"),
+		path.Join(d.databaseDir, "postgresql.conf"),
+	)
 }
 
 func (d *Database) Execute(database string, sql string) error {
