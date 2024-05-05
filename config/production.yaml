@@ -81,8 +81,8 @@ database:
 # You can also specify a 'socket' path to a unix socket but first need to
 # set 'hostname' and 'port' to null
 redis:
-  hostname: '127.0.0.1'
-  port: 6379
+  hostname: '/var/snap/nextcloud/current/redis.sock'
+  port: 0
   auth: null # Used by both standalone and sentinel
   db: 0
   sentinel:

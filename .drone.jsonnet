@@ -24,6 +24,20 @@ local build(arch, test_ui, dind) = [{
         'echo $DRONE_BUILD_NUMBER > version',
       ],
     },
+             {
+                name: "redis",
+                image: "redis:" + redis,
+                commands: [
+                    "./redis/build.sh"
+                ]
+            },
+             {
+                name: "redis test",
+                image: 'syncloud/platform-buster-' + arch + ':' + platform,
+                commands: [
+                    "./redis/test.sh"
+                ]
+            },
   {
             name: "postgresql",
             image: "postgres:" + postgresql,

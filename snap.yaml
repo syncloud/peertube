@@ -23,6 +23,12 @@ apps:
       - network
       - network-bind
     restart-condition: always
+  redis:
+    user: peertube
+    daemon: simple
+    command: bin/service.redis.sh
+    restart-condition: always
+    before: [peertube]
 
   psql:
     command: bin/psql.sh
