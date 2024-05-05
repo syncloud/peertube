@@ -33,19 +33,22 @@ type Installer struct {
 	platformClient     *platform.Client
 	database           *Database
 	installFile        string
+	executor           *Executor
 	logger             *zap.Logger
 }
 
 func New(logger *zap.Logger) *Installer {
 	configDir := path.Join(DataDir, "config")
 
+	executor := &Executor{}
 	return &Installer{
 		newVersionFile:     path.Join(AppDir, "version"),
 		currentVersionFile: path.Join(DataDir, "version"),
 		configDir:          configDir,
 		platformClient:     platform.New(),
-		database:           NewDatabase(AppDir, DataDir, configDir, App, logger),
+		database:           NewDatabase(AppDir, DataDir, configDir, App, executor, logger),
 		installFile:        path.Join(CommonDir, "installed"),
+		executor:           executor,
 		logger:             logger,
 	}
 }
@@ -161,6 +164,15 @@ func (i *Installer) PostRefresh() error {
 	return nil
 
 }
+func (i *Installer) AccessChange() error {
+	err := i.UpdateConfigs()
+	if err != nil {
+		return err
+	}
+	err = i.executor.Run("snap", "restart", "peertube")
+	return err
+}
+
 func (i *Installer) StorageChange() error {
 	storageDir, err := i.platformClient.InitStorage(App, App)
 	if err != nil {

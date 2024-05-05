@@ -17,6 +17,7 @@ type Database struct {
 	user        string
 	backupFile  string
 	databaseDir string
+	executor    *Executor
 	logger      *zap.Logger
 }
 
@@ -25,6 +26,7 @@ func NewDatabase(
 	dataDir string,
 	configPath string,
 	user string,
+	executor *Executor,
 	logger *zap.Logger,
 ) *Database {
 	return &Database{
@@ -34,6 +36,7 @@ func NewDatabase(
 		user:        user,
 		backupFile:  path.Join(dataDir, "database.dump"),
 		databaseDir: path.Join(dataDir, "database"),
+		executor:    executor,
 		logger:      logger,
 	}
 }
@@ -68,7 +71,7 @@ func (d *Database) InitConfig() error {
 }
 
 func (d *Database) Execute(database string, sql string) error {
-	return d.Run("snap",
+	return d.executor.Run("snap",
 		"run", "peertube.psql",
 		"-U", d.user,
 		"-d", database,
@@ -77,7 +80,7 @@ func (d *Database) Execute(database string, sql string) error {
 }
 
 func (d *Database) Restore() error {
-	return d.Run("snap",
+	return d.executor.Run("snap",
 		"run", "peertube.psql",
 		"-f", d.backupFile,
 		"postgres",
@@ -85,7 +88,7 @@ func (d *Database) Restore() error {
 }
 
 func (d *Database) Backup() error {
-	return d.Run("snap",
+	return d.executor.Run("snap",
 		"run", "peertube.pgdumpall",
 		"-f", d.backupFile,
 	)
@@ -106,15 +109,4 @@ func (d *Database) createDbIfMissing(db string) error {
 	}
 	d.logger.Info("database already exists", zap.String("db", db))
 	return nil
-}
-
-func (d *Database) Run(app string, args ...string) error {
-	cmd := exec.Command(app, args...)
-	d.logger.Info("postgres executing", zap.String("cmd", cmd.String()))
-	out, err := cmd.CombinedOutput()
-	d.logger.Info(cmd.String(), zap.ByteString("output", out))
-	if err != nil {
-		d.logger.Error(cmd.String(), zap.String("postgres error", "failed to run command"))
-	}
-	return err
 }

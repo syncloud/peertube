@@ -107,6 +107,10 @@ def test_backup(device, artifact_dir):
     device.run_ssh("snap run platform.cli backup restore {0}".format(backup['file']))
 
 
+def test_access_change(device, artifact_dir):
+    device.run_ssh("snap run peertube.access-change")
+
+
 def retry(method, retries=10):
     attempt = 0
     exception = None
