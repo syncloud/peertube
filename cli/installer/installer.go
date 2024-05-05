@@ -51,17 +51,8 @@ func New(logger *zap.Logger) *Installer {
 }
 
 func (i *Installer) Install() error {
-	err := linux.CreateUser(App)
-	if err != nil {
-		return err
-	}
 
-	err = os.Mkdir(path.Join(DataDir, "nginx"), 0755)
-	if err != nil {
-		return err
-	}
-
-	err = i.UpdateConfigs()
+	err := i.UpdateConfigs()
 	if err != nil {
 		return err
 	}
@@ -75,25 +66,19 @@ func (i *Installer) Install() error {
 		return err
 	}
 
-	err = i.FixPermissions()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func (i *Installer) Configure() error {
-	_, err := os.Stat(i.installFile)
-	if os.IsNotExist(err) {
-		err := i.Initialize()
-		if err != nil {
-			return err
-		}
-	} else {
-		//upgrade
+	if i.IsInstalled() {
+		return i.Upgrade()
 	}
-	return nil
+	return i.Initialize()
+}
+
+func (i *Installer) IsInstalled() bool {
+	_, err := os.Stat(i.installFile)
+	return os.IsExist(err)
 }
 
 func (i *Installer) Initialize() error {
@@ -181,18 +166,28 @@ func (i *Installer) StorageChange() error {
 	if err != nil {
 		return err
 	}
-
-	err = os.Mkdir(path.Join(storageDir, "media"), 0755)
+	err = i.createMissingDirs(
+		path.Join(storageDir, "tmp"),
+		path.Join(storageDir, "tmp-persistent"),
+		path.Join(storageDir, "bin"),
+		path.Join(storageDir, "avatars"),
+		path.Join(storageDir, "web-videos"),
+		path.Join(storageDir, "streaming-playlists"),
+		path.Join(storageDir, "original-video-files"),
+		path.Join(storageDir, "redundancy"),
+		path.Join(storageDir, "logs"),
+		path.Join(storageDir, "previews"),
+		path.Join(storageDir, "thumbnails"),
+		path.Join(storageDir, "storyboards"),
+		path.Join(storageDir, "torrents"),
+		path.Join(storageDir, "captions"),
+		path.Join(storageDir, "cache"),
+		path.Join(storageDir, "plugins"),
+		path.Join(storageDir, "well-known"),
+		path.Join(storageDir, "client-overrides"),
+	)
 	if err != nil {
-		if !os.IsExist(err) {
-			return err
-		}
-	}
-	err = os.Mkdir(path.Join(storageDir, "cache"), 0755)
-	if err != nil {
-		if !os.IsExist(err) {
-			return err
-		}
+		return err
 	}
 	err = linux.Chown(storageDir, App)
 	if err != nil {
@@ -211,8 +206,17 @@ func (i *Installer) UpdateVersion() error {
 }
 
 func (i *Installer) UpdateConfigs() error {
+	err := linux.CreateUser(App)
+	if err != nil {
+		return err
+	}
 
-	err := i.StorageChange()
+	err = i.StorageChange()
+	if err != nil {
+		return err
+	}
+
+	err = createMissingDir(path.Join(DataDir, "nginx"))
 	if err != nil {
 		return err
 	}
@@ -242,6 +246,10 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
+	err = i.FixPermissions()
+	if err != nil {
+		return err
+	}
 	return nil
 
 }
@@ -268,6 +276,28 @@ func (i *Installer) RestorePreStart() error {
 
 func (i *Installer) RestorePostStart() error {
 	return i.Configure()
+}
+
+func (i *Installer) createMissingDirs(dirs ...string) error {
+	for _, dir := range dirs {
+		err := createMissingDir(dir)
+		if err != nil {
+			i.logger.Error("cannot create dir", zap.String("dir", dir), zap.Error(err))
+			return err
+		}
+	}
+	return nil
+}
+
+func createMissingDir(dir string) error {
+	_, err := os.Stat(dir)
+	if os.IsNotExist(err) {
+		err = os.Mkdir(dir, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func getOrCreateUuid(file string) (string, error) {

@@ -144,23 +144,23 @@ defaults:
 
 # From the project root directory
 storage:
-  tmp: '/var/www/peertube/storage/tmp/' # Use to download data (imports etc), store uploaded files before and during processing...
-  tmp_persistent: '/var/www/peertube/storage/tmp-persistent/' # As tmp but the directory is not cleaned up between PeerTube restarts
-  bin: '/var/www/peertube/storage/bin/'
-  avatars: '/var/www/peertube/storage/avatars/'
-  web_videos: '/var/www/peertube/storage/web-videos/'
-  streaming_playlists: '/var/www/peertube/storage/streaming-playlists/'
-  original_video_files: '/var/www/peertube/storage/original-video-files/'
-  redundancy: '/var/www/peertube/storage/redundancy/'
-  logs: '/var/www/peertube/storage/logs/'
-  previews: '/var/www/peertube/storage/previews/'
-  thumbnails: '/var/www/peertube/storage/thumbnails/'
-  storyboards: '/var/www/peertube/storage/storyboards/'
-  torrents: '/var/www/peertube/storage/torrents/'
-  captions: '/var/www/peertube/storage/captions/'
-  cache: '/var/www/peertube/storage/cache/'
-  plugins: '/var/www/peertube/storage/plugins/'
-  well_known: '/var/www/peertube/storage/well-known/'
+  tmp: '/data/peertube/tmp/' # Use to download data (imports etc), store uploaded files before and during processing...
+  tmp_persistent: '/data/peertube/tmp-persistent/' # As tmp but the directory is not cleaned up between PeerTube restarts
+  bin: '/data/peertube/bin/'
+  avatars: '/data/peertube/avatars/'
+  web_videos: '/data/peertube/web-videos/'
+  streaming_playlists: '/data/peertube/streaming-playlists/'
+  original_video_files: '/data/peertube/original-video-files/'
+  redundancy: '/data/peertube/redundancy/'
+  logs: '/data/peertube/logs/'
+  previews: '/data/peertube/previews/'
+  thumbnails: '/data/peertube/thumbnails/'
+  storyboards: '/data/peertube/storyboards/'
+  torrents: '/data/peertube/torrents/'
+  captions: '/data/peertube/captions/'
+  cache: '/data/peertube/cache/'
+  plugins: '/data/peertube/plugins/'
+  well_known: '/data/peertube/well-known/'
   # Overridable client files in client/dist/assets/images:
   # - logo.svg
   # - favicon.png
@@ -171,7 +171,7 @@ storage:
   # Could contain for example assets/images/favicon.png
   # If the file exists, peertube will serve it
   # If not, peertube will fallback to the default file
-  client_overrides: '/var/www/peertube/storage/client-overrides/'
+  client_overrides: '/data/peertube/client-overrides/'
 
 static_files:
   # Require and check user authentication when accessing private files (internal/private video files)
