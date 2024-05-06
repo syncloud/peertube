@@ -17,4 +17,3 @@ ldd ${BUILD_DIR}/usr/bin/ffmpeg
 mkdir ${BUILD_DIR}/bin
 cp $DIR/bin/* ${BUILD_DIR}/bin
 ldd ${BUILD_DIR}/usr/bin/ffmpeg
-file ${BUILD_DIR}/usr/bin/ffmpeg
