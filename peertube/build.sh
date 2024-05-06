@@ -11,9 +11,10 @@ sed -i 's#new transports.File#new transports.Console#g' /app/dist/core/helpers/a
 mv /app ${BUILD_DIR}/app
 cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
-cp -r /bin ${BUILD_DIR}
 cp -r /lib ${BUILD_DIR}
+
 ldd ${BUILD_DIR}/usr/bin/ffmpeg
+mkdir ${BUILD_DIR}/bin
 cp $DIR/bin/* ${BUILD_DIR}/bin
 ldd ${BUILD_DIR}/usr/bin/ffmpeg
 file ${BUILD_DIR}/usr/bin/ffmpeg
