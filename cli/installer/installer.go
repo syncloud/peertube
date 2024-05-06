@@ -40,7 +40,7 @@ type Installer struct {
 func New(logger *zap.Logger) *Installer {
 	configDir := path.Join(DataDir, "config")
 
-	executor := &Executor{}
+	executor := NewExecutor(logger)
 	return &Installer{
 		newVersionFile:     path.Join(AppDir, "version"),
 		currentVersionFile: path.Join(DataDir, "version"),
