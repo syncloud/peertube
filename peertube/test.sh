@@ -6,5 +6,8 @@ cd ${DIR}
 BUILD_DIR=${DIR}/../build/snap/peertube
 ${BUILD_DIR}/bin/node.sh --version
 
+ldd ${BUILD_DIR}/usr/bin/ffmpeg
+file ${BUILD_DIR}/usr/bin/ffmpeg
+
 $BUILD_DIR/bin/ffmpeg --help
 $BUILD_DIR/bin/ffprobe --help
