@@ -71,7 +71,7 @@ database:
   hostname: '/var/snap/peertube/current/database'
   port: 5432
   ssl: false
-  suffix: '_prod'
+  suffix: ''
   username: 'peertube'
   password: 'peertube'
   pool:
