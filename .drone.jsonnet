@@ -77,7 +77,7 @@ local build(arch, test_ui, dind) = [{
       ],
     },
     {
-      name: 'test peertube',
+      name: 'peertube test',
       image: 'syncloud/platform-buster-' + arch + ':' + platform,
       commands: [
         './peertube/test.sh',
