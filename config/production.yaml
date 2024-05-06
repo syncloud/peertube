@@ -81,8 +81,9 @@ database:
 # You can also specify a 'socket' path to a unix socket but first need to
 # set 'hostname' and 'port' to null
 redis:
-  hostname: '/var/snap/peertube/current/redis.sock'
-  port: 0
+  socket: '/var/snap/peertube/current/redis.sock'
+  hostname: null
+  port: null
   auth: null # Used by both standalone and sentinel
   db: 0
   sentinel:
