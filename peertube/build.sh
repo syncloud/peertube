@@ -3,6 +3,9 @@
 DIR=$( cd "$( dirname "$0" )" && pwd )
 cd ${DIR}
 
+apt update
+apt install -y wget
+
 BUILD_DIR=${DIR}/../build/snap/peertube
 mkdir -p ${BUILD_DIR}
 sed -i 's/server\.listen(port, hostname/server\.listen\(hostname/g' /app/dist/server.js
