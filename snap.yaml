@@ -30,6 +30,9 @@ apps:
     restart-condition: always
     before: [peertube]
 
+  npm:
+    command: peertube/bin/npm
+
   psql:
     command: bin/psql.sh
 

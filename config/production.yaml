@@ -100,7 +100,7 @@ smtp:
   transport: smtp
   # Path to sendmail command. Required if you use sendmail transport
   sendmail: null
-  hostname: null
+  hostname: 'localhost'
   port: 465 # If you use StartTLS: 587
   username: null
   password: null

@@ -5,5 +5,4 @@ export NODE_CONFIG_DIR=/var/snap/peertube/current/config
 export PATH=$PATH:${DIR}/peertube/bin
 cd ${DIR}/peertube/app
 /bin/rm -f /var/snap/peertube/current/peertube.socket
-exec ${DIR}/peertube/bin/node.sh dist/server
-
+exec node dist/server

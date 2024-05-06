@@ -17,3 +17,9 @@ ldd ${BUILD_DIR}/usr/bin/ffmpeg
 mkdir ${BUILD_DIR}/bin
 cp $DIR/bin/* ${BUILD_DIR}/bin
 ldd ${BUILD_DIR}/usr/bin/ffmpeg
+
+wget https://framagit.org/framasoft/peertube/official-plugins/-/archive/master/official-plugins-master.tar.gz
+tar xf official-plugins-master.tar.gz
+mkdir ${BUILD_DIR}/app/plugins
+cp -r official-plugins-master/peertube-plugin-auth-openid-connect ${BUILD_DIR}/app/plugins
+

@@ -112,6 +112,10 @@ def test_access_change(device, artifact_dir):
     device.run_ssh("snap run peertube.access-change")
 
 
+def test_npm(device, artifact_dir):
+    device.run_ssh("snap run peertube.npm run")
+
+
 def retry(method, retries=10):
     attempt = 0
     exception = None
