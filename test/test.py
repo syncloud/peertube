@@ -1,6 +1,7 @@
 import os
 from os.path import join
 from subprocess import check_output
+import json
 
 import pytest
 import requests
