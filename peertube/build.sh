@@ -13,6 +13,7 @@ cp -r /opt ${BUILD_DIR}
 cp -r /usr ${BUILD_DIR}
 cp -r /bin ${BUILD_DIR}
 cp -r /lib ${BUILD_DIR}
+ldd ${BUILD_DIR}/usr/bin/ffmpeg
 cp $DIR/bin/* ${BUILD_DIR}/bin
 ldd ${BUILD_DIR}/usr/bin/ffmpeg
 file ${BUILD_DIR}/usr/bin/ffmpeg
