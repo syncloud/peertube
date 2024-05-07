@@ -259,7 +259,7 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	err = i.executor.Run("snap",
-		"peertube.npm", "run",
+		"run", "peertube.npm",
 		"plugin:install", "--",
 		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
 	)
