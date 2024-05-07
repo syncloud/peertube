@@ -74,9 +74,26 @@ func (i *Installer) Install() error {
 
 func (i *Installer) Configure() error {
 	if i.IsInstalled() {
-		return i.Upgrade()
+		err := i.Upgrade()
+		if err != nil {
+			return err
+		}
 	}
-	return i.Initialize()
+	err := i.Initialize()
+	if err != nil {
+		return err
+	}
+
+	err = i.executor.Run("snap",
+		"run", "peertube.npm", "run",
+		"plugin:install", "--",
+		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (i *Installer) IsInstalled() bool {
@@ -253,15 +270,6 @@ func (i *Installer) UpdateConfigs() error {
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
 		variables,
-	)
-	if err != nil {
-		return err
-	}
-
-	err = i.executor.Run("snap",
-		"run", "peertube.npm", "run",
-		"plugin:install", "--",
-		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
 	)
 	if err != nil {
 		return err
