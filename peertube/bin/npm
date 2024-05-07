@@ -4,4 +4,4 @@ export PATH=$PATH:${DIR}
 export NODE_CONFIG_DIR=/var/snap/peertube/current/config
 export NODE_ENV=production
 cd $DIR/../app
-node $DOR/../usr/local/bin/npm "$@"
+node $DIR/../usr/local/bin/npm "$@"
