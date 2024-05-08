@@ -4,5 +4,5 @@ export PATH=$PATH:${DIR}
 export NODE_CONFIG_DIR=/var/snap/peertube/current/config
 export NODE_ENV=production
 cd $DIR/../app
-exec node $DIR/../opt/yarn-*/bin/yarn.js "$@"
+exec node $DIR/../opt/yarn-*/bin/yarn.js --ignore-workspace-root-check "$@"
 
