@@ -85,7 +85,7 @@ func (i *Installer) Configure() error {
 		}
 	}
 
-	err = i.executor.Run("snap",
+	err := i.executor.Run("snap",
 		"run", "peertube.npm", "run",
 		"plugin:install", "--",
 		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
