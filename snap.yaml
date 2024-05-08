@@ -35,10 +35,7 @@ apps:
 
   node:
     command: peertube/bin/node
-
-  tools:
-    command: peertube/bin/node /snap/peertube/current/peertube/app/dist/server/tools/peertube.js
-
+ 
   psql:
     command: bin/psql.sh
 
