@@ -78,10 +78,11 @@ func (i *Installer) Configure() error {
 		if err != nil {
 			return err
 		}
-	}
-	err := i.Initialize()
-	if err != nil {
-		return err
+	} else {
+		err := i.Initialize()
+		if err != nil {
+			return err
+		}
 	}
 
 	err = i.executor.Run("snap",
