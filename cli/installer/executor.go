@@ -3,6 +3,7 @@ package installer
 import (
 	"go.uber.org/zap"
 	"os/exec"
+	"strings"
 )
 
 type Executor struct {
@@ -19,9 +20,9 @@ func (e *Executor) Run(app string, args ...string) error {
 	cmd := exec.Command(app, args...)
 	e.logger.Info("executing", zap.String("cmd", cmd.String()))
 	out, err := cmd.CombinedOutput()
-	e.logger.Info(cmd.String(), zap.ByteString("output", out))
-	if err != nil {
-		e.logger.Error(cmd.String(), zap.Error(err))
+	e.logger.Info("command output", zap.String("cmd", cmd.String()))
+	for _, line := range strings.Split(string(out), "\n") {
+		e.logger.Info(line)
 	}
 	return err
 }

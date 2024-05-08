@@ -91,6 +91,7 @@ func (i *Installer) Configure() error {
 		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
 	)
 	if err != nil {
+		i.logger.Error("failed to install plugin", zap.Error(err))
 		return err
 	}
 
