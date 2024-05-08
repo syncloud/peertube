@@ -213,9 +213,9 @@ func (i *Installer) StorageChange() error {
 		path.Join(storageDir, "torrents"),
 		path.Join(storageDir, "captions"),
 		path.Join(storageDir, "cache"),
-		path.Join(storageDir, "plugins"),
 		path.Join(storageDir, "well-known"),
 		path.Join(storageDir, "client-overrides"),
+		path.Join(DataDir, "plugins"),
 	)
 	if err != nil {
 		return err

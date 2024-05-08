@@ -160,7 +160,7 @@ storage:
   torrents: '/data/peertube/torrents/'
   captions: '/data/peertube/captions/'
   cache: '/data/peertube/cache/'
-  plugins: '/data/peertube/plugins/'
+  plugins: '/var/snap/peertube/current/plugins/'
   well_known: '/data/peertube/well-known/'
   # Overridable client files in client/dist/assets/images:
   # - logo.svg
