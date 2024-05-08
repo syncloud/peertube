@@ -86,9 +86,9 @@ func (i *Installer) Configure() error {
 	}
 
 	err := i.executor.Run("snap",
-		"run", "peertube.npm", "run",
-		"plugin:install", "--",
-		"--plugin-path", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
+		"run", "peertube.npm", "tools",
+		"plugins", "install", "--path",
+		fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
 	)
 	if err != nil {
 		i.logger.Error("failed to install plugin", zap.Error(err))

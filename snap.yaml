@@ -33,6 +33,12 @@ apps:
   npm:
     command: peertube/bin/npm
 
+  node:
+    command: peertube/bin/node
+
+  tools:
+    command: peertube/bin/node peertube/app/dist/server/tools/peertube.js
+
   psql:
     command: bin/psql.sh
 
