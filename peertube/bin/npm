@@ -1,7 +1,5 @@
 #!/bin/bash -e
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 export PATH=$PATH:${DIR}
-export NODE_CONFIG_DIR=/var/snap/peertube/current/config
-export NODE_ENV=production
 cd $DIR/../app
 node $DIR/../usr/local/bin/npm "$@"
