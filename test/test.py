@@ -117,7 +117,7 @@ def test_npm(device, artifact_dir):
 
 
 def test_sql_plugin(device, artifact_dir):
-    device.run_ssh("snap run peertube.psql -U peertube -d peertube -c 'select * from plugin'")
+    device.run_ssh("snap run peertube.psql -U peertube -d peertube -c 'select * from plugin'", retries=10)
 
 
 def retry(method, retries=10):
