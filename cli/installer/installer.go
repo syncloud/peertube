@@ -8,6 +8,7 @@ import (
 	"github.com/syncloud/golib/linux"
 	"github.com/syncloud/golib/platform"
 	"go.uber.org/zap"
+	"time"
 
 	"os"
 	"path"
@@ -85,17 +86,38 @@ func (i *Installer) Configure() error {
 		}
 	}
 
-	/*
-		err := i.executor.Run("snap",
-			"run", "peertube.node",
-			fmt.Sprintf("%s/peertube/app/dist/scripts/plugin/install.js", AppDir),
-			"-p", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
-		)
-		if err != nil {
-			i.logger.Error("failed to install plugin", zap.Error(err))
-			return err
+	err := i.InstallPlugins()
+
+	return err
+}
+
+func (i *Installer) InstallPlugins() error {
+	ready := false
+	attempts := 10
+	attempt := 0
+	for !ready {
+		if attempt > attempts {
+			return fmt.Errorf("cannot find plugin table")
 		}
-	*/
+		err := i.database.Execute(App, "select * from plugin")
+		if err != nil {
+			i.logger.Info("waiting for plugin table", zap.Int("attempt", attempt), zap.Error(err))
+			attempt++
+			time.Sleep(10 * time.Second)
+		} else {
+			ready = true
+		}
+	}
+
+	err := i.executor.Run("snap",
+		"run", "peertube.node",
+		fmt.Sprintf("%s/peertube/app/dist/scripts/plugin/install.js", AppDir),
+		"-p", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
+	)
+	if err != nil {
+		i.logger.Error("failed to install plugin", zap.Error(err))
+		return err
+	}
 
 	return nil
 }
