@@ -86,12 +86,20 @@ func (i *Installer) Configure() error {
 		}
 	}
 
-	err := i.InstallPlugins()
+	err := i.registerOIDC()
+	if err != nil {
+		return err
+	}
 
-	return err
+	err = i.restartPeertube(err)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (i *Installer) InstallPlugins() error {
+func (i *Installer) registerOIDC() error {
 	ready := false
 	attempts := 10
 	attempt := 0
@@ -109,13 +117,39 @@ func (i *Installer) InstallPlugins() error {
 		}
 	}
 
-	err := i.executor.Run("snap",
+	password, err := i.platformClient.RegisterOIDCClient(App, "/plugins/auth-openid-connect/router/code-cb", false, "client_secret_basic")
+	if err != nil {
+		return err
+	}
+
+	err = i.executor.Run("snap",
 		"run", "peertube.node",
 		fmt.Sprintf("%s/peertube/app/dist/scripts/plugin/install.js", AppDir),
 		"-p", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
 	)
 	if err != nil {
 		i.logger.Error("failed to install plugin", zap.Error(err))
+		return err
+	}
+
+	authUrl, err := i.platformClient.GetAppUrl("auth")
+	if err != nil {
+		return err
+	}
+
+	err = i.database.Execute(App, fmt.Sprintf(`
+update pligin set settings = '{' ||
+                             '"scope": "openid email profile", ' ||
+                             '"client-id": "peertube", ' ||
+                             '"discover-url": "%s", ' ||
+                             '"client-secret": "%s", ' ||
+                             '"mail-property": "email", ' ||
+                             '"auth-display-name": "My Syncloud", ' ||
+                             '"username-property": "preferred_username", ' ||
+                             '"signature-algorithm": "RS256"' ||
+                             '}'
+where name = 'auth-openid-connect'`, App, authUrl, password))
+	if err != nil {
 		return err
 	}
 
@@ -212,6 +246,15 @@ func (i *Installer) AccessChange() error {
 	if err != nil {
 		return err
 	}
+	err = i.registerOIDC()
+	if err != nil {
+		return err
+	}
+	err = i.restartPeertube(err)
+	return err
+}
+
+func (i *Installer) restartPeertube(err error) error {
 	err = i.executor.Run("snap", "restart", "peertube")
 	return err
 }
