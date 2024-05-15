@@ -138,9 +138,9 @@ func (i *Installer) registerOIDC() error {
 	}
 
 	err = i.database.Execute(App, fmt.Sprintf(`
-update pligin set settings = '{' ||
+update plugin set settings = '{' ||
                              '"scope": "openid email profile", ' ||
-                             '"client-id": "peertube", ' ||
+                             '"client-id": "%s", ' ||
                              '"discover-url": "%s", ' ||
                              '"client-secret": "%s", ' ||
                              '"mail-property": "email", ' ||
