@@ -137,18 +137,17 @@ func (i *Installer) registerOIDC() error {
 		return err
 	}
 
-	err = i.database.Execute(App, fmt.Sprintf(`
-update plugin set settings = '{' ||
-                             '"scope": "openid email profile", ' ||
-                             '"client-id": "%s", ' ||
-                             '"discover-url": "%s", ' ||
-                             '"client-secret": "%s", ' ||
-                             '"mail-property": "email", ' ||
-                             '"auth-display-name": "My Syncloud", ' ||
-                             '"username-property": "preferred_username", ' ||
-                             '"signature-algorithm": "RS256"' ||
-                             '}'
-where name = 'auth-openid-connect'`, App, authUrl, password))
+	settings := `update plugin set settings = '{`
+	settings += `"scope": "openid email profile",`
+	settings += fmt.Sprintf(`"client-id": "%s",`, App)
+	settings += fmt.Sprintf(`"discover-url": "%s",`, authUrl)
+	settings += fmt.Sprintf(`"client-secret": "%s",`, password)
+	settings += `"mail-property": "email",`
+	settings += `"auth-display-name": "My Syncloud",`
+	settings += `"username-property": "preferred_username",`
+	settings += `"signature-algorithm": "RS256"`
+	settings += `}' where name = 'auth-openid-connect'`
+	err = i.database.Execute(App, settings)
 	if err != nil {
 		return err
 	}
