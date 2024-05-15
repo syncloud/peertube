@@ -254,7 +254,7 @@ func (i *Installer) AccessChange() error {
 }
 
 func (i *Installer) restartPeertube(err error) error {
-	err = i.executor.Run("snap", "restart", "peertube")
+	err = i.platformClient.RestartService("peertube.peertube")
 	return err
 }
 
