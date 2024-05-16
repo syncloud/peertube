@@ -114,7 +114,26 @@ local build(arch, test_ui, dind) = [{
       ],
     },
   ] + (if test_ui then [
-         {
+    {
+            name: "selenium",
+            image: "selenium/standalone-" + browser + ":" + selenium,
+            detach: true,
+            environment: {
+                SE_NODE_SESSION_TIMEOUT: "999999",
+                START_XVFB: "true"
+            },
+               volumes: [{
+                name: "shm",
+                path: "/dev/shm"
+            }],
+            commands: [
+                "cat /etc/hosts",
+                "getent hosts " + arch + ".buster.com | sed 's/" + arch +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
+                "cat /etc/hosts",
+                "/opt/bin/entry_point.sh"
+            ]
+         },
+     {
            name: 'selenium-video',
            image: 'selenium/video:ffmpeg-4.3.1-20220208',
            detach: true,
@@ -265,16 +284,7 @@ local build(arch, test_ui, dind) = [{
         },
       ],
     },
-  ] + (if test_ui then [
-         {
-           name: 'selenium',
-           image: 'selenium/standalone-' + browser + ':' + selenium,
-           volumes: [{
-             name: 'shm',
-             path: '/dev/shm',
-           }],
-         },
-       ] else []),
+  ],
   volumes: [
     {
       name: 'dbus',
