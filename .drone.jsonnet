@@ -1,5 +1,5 @@
 local name = 'peertube';
-local browser = 'chrome';
+local browser = 'firefox';
 local version = '6.1.0';
 local nginx = '1.24.0';
 local postgresql = "15-bullseye";

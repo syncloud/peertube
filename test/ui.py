@@ -28,6 +28,9 @@ def test_start(module_setup, app, domain, device_host):
 
 
 def test_login(selenium, device_user, device_password):
+    selenium.driver.open("https://auth.buster.com")
+    selenium.find_by(By.ID, "username-textfield")
+    selenium.screenshot('auth')
     selenium.open_app()
     selenium.find_by(By.XPATH, "//a[contains(.,'Login')]").click()
     selenium.find_by(By.XPATH, "//a[contains(.,'My Syncloud')]").click()
