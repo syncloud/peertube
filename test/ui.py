@@ -28,7 +28,7 @@ def test_start(module_setup, app, domain, device_host):
 
 
 def test_login(selenium, device_user, device_password):
-    selenium.driver.open("https://auth.buster.com")
+    selenium.driver.get("https://auth.buster.com")
     selenium.find_by(By.ID, "username-textfield")
     selenium.screenshot('auth')
     selenium.open_app()
@@ -46,3 +46,4 @@ def test_login(selenium, device_user, device_password):
 
 def test_teardown(driver):
     driver.quit()
+
