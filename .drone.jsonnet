@@ -128,7 +128,7 @@ local build(arch, test_ui, dind) = [{
             }],
             commands: [
                 "cat /etc/hosts",
-                "getent hosts " + arch + ".buster.com | sed 's/" + arch +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
+                "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
                 "cat /etc/hosts",
                 "/opt/bin/entry_point.sh"
             ]
