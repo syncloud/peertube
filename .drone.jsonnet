@@ -1,5 +1,5 @@
 local name = 'peertube';
-local browser = 'firefox';
+local browser = 'chrome';
 local version = '6.1.0';
 local nginx = '1.24.0';
 local postgresql = "15-bullseye";
@@ -315,3 +315,4 @@ local build(arch, test_ui, dind) = [{
 
 build('amd64', true, '20.10.21-dind') +
 build('arm64', false, '20.10.21-dind')
+
