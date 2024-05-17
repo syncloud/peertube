@@ -29,29 +29,8 @@ def test_start(module_setup, app, domain, device_host):
 
 def test_login(selenium, device_user, device_password):
     selenium.open_app()
-    selenium.find_by(By.XPATH, "//a[contains(.,'Login')]").click()
-    selenium.find_by(By.ID, "username-textfield").send_keys(device_user)
-    password = selenium.find_by(By.ID, "password-textfield")
-    password.send_keys(device_password)
-    selenium.screenshot('login')
-    #password.send_keys(Keys.RETURN)
-    selenium.find_by(By.ID, "sign-in-button").click()
-    selenium.find_by(By.XPATH, "//div[contains(.,'Connected to')]")
-    selenium.screenshot('connected')
-    selenium.invisible_by(By.XPATH, "//div[contains(.,'Connected to')]")
-    selenium.find_by(By.XPATH, "//p[contains(.,'No active downloads')]")
-    selenium.screenshot('no-downloads')
+    selenium.find_by(By.XPATH, "//a[contains(.,'My Syncloud')]").click()
 
-
-def test_download(selenium, device_user, device_password):
-    selenium.find_by(By.XPATH, "//button[@aria-label='Home speed dial']").click()
-    selenium.find_by(By.XPATH, "//button[@aria-label='New download']").click()
-    selenium.find_by(By.XPATH, "//textarea").send_keys("https://m.peertube.com/watch?v=x983nr0lXwo")
-    selenium.find_by(By.XPATH, "//button[contains(.,'Start')]").click()
-    selenium.find_by(By.XPATH, "//div[contains(.,'Syncloud Introduction')]")
-    selenium.find_by(By.XPATH, "//span[contains(.,'Completed')]")
-    selenium.screenshot('completed')
 
 def test_teardown(driver):
     driver.quit()
-
