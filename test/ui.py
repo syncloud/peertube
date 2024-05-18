@@ -41,7 +41,7 @@ def test_login(selenium, device_user, device_password):
     selenium.screenshot('login')
     #password.send_keys(Keys.RETURN)
     selenium.find_by(By.ID, "sign-in-button").click()
-    selenium.find_by(By.CSS, ".publish-button-label")
+    selenium.find_by(By.CLASS_NAME, "publish-button-label")
     selenium.screenshot('main')
 
 
