@@ -46,6 +46,7 @@ def test_login(selenium, device_user, device_password):
     selenium.screenshot('main')
 
 def test_publish_video(selenium):
+    selenium.find_by(By.XPATH, "//input[@type=='button' and @value='Close']").click()
     selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
     selenium.find_by_xpath("//span[text()='New post']").click()
     selenium.find_by_xpath("//label/textarea").send_keys("test video")
@@ -63,4 +64,3 @@ def test_publish_video(selenium):
 
 def test_teardown(driver):
     driver.quit()
-
