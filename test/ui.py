@@ -52,6 +52,7 @@ def test_publish_video(selenium):
     #selenium.find_by_xpath("//label/textarea").send_keys("test video")
     file = selenium.driver.find_element(By.ID, 'videofile')
     selenium.driver.execute_script("arguments[0].removeAttribute('style')", file)
+    selenium.screenshot('file')
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
     publish = "//button[text()='Publish!']"
     selenium.wait_driver.until(EC.element_to_be_clickable((By.XPATH, publish)))
