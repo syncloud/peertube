@@ -62,6 +62,7 @@ def test_activate_device(device):
 
 
 def test_install(app_archive_path, device_host, device_password):
+    device.run_ssh('touch /var/snap/platform/current/NODE_TLS_REJECT_UNAUTHORIZED_0')
     local_install(device_host, device_password, app_archive_path)
 
 
