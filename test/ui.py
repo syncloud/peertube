@@ -48,9 +48,9 @@ def test_login(selenium, device_user, device_password):
 def test_publish_video(selenium):
     selenium.find_by(By.XPATH, "//input[@type='button' and @value='Close']").click()
     selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
-    selenium.find_by_xpath("//span[text()='New post']").click()
-    selenium.find_by_xpath("//label/textarea").send_keys("test video")
-    file = selenium.driver.find_element(By.XPATH, '//input[@type="file"]')
+    #selenium.find_by_xpath("//span[text()='New post']").click()
+    #selenium.find_by_xpath("//label/textarea").send_keys("test video")
+    file = selenium.driver.find_element(By.ID, 'videofile')
     selenium.driver.execute_script("arguments[0].removeAttribute('style')", file)
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
     publish = "//button[text()='Publish!']"
