@@ -41,8 +41,24 @@ def test_login(selenium, device_user, device_password):
     selenium.screenshot('login')
     #password.send_keys(Keys.RETURN)
     selenium.find_by(By.ID, "sign-in-button").click()
+    selenium.find_by(By.ID, "accept-button").click()
     selenium.find_by(By.CLASS_NAME, "publish-button-label")
     selenium.screenshot('main')
+
+def test_publish_video(selenium):
+    selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
+    selenium.find_by_xpath("//span[text()='New post']").click()
+    selenium.find_by_xpath("//label/textarea").send_keys("test video")
+    file = selenium.driver.find_element(By.XPATH, '//input[@type="file"]')
+    selenium.driver.execute_script("arguments[0].removeAttribute('style')", file)
+    file.send_keys(join(DIR, 'videos', 'test.mp4'))
+    publish = "//button[text()='Publish!']"
+    selenium.wait_driver.until(EC.element_to_be_clickable((By.XPATH, publish)))
+    selenium.find_by_xpath(publish).click()
+    selenium.find_by_xpath("//*[text()='test video']")
+    selenium.find_by_xpath("//span[text()='New post']")
+    assert not selenium.exists_by(By.XPATH, "//span[contains(.,'Error processing')]")
+    selenium.screenshot('publish-video')
 
 
 def test_teardown(driver):
