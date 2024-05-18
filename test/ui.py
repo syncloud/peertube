@@ -51,11 +51,11 @@ def test_publish_video(selenium):
     #selenium.find_by_xpath("//span[text()='New post']").click()
     #selenium.find_by_xpath("//label/textarea").send_keys("test video")
     file = selenium.driver.find_element(By.ID, 'videofile')
-    selenium.driver.execute_script("arguments[0].removeAttribute('style')", file)
+    selenium.driver.execute_script("Object.values(arguments[0].attributes).filter(({name}) => name.startsWith('_ngcontent')).forEach(({name}) => arguments[0].removeAttribute(name))", file)
     selenium.screenshot('file')
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
     publish = "//button[text()='Publish!']"
-    selenium.wait_driver.until(EC.element_to_be_clickable((By.XPATH, publish)))
+    selenium.clickable_by((By.XPATH, publish))
     selenium.find_by_xpath(publish).click()
     selenium.find_by_xpath("//*[text()='test video']")
     selenium.find_by_xpath("//span[text()='New post']")
