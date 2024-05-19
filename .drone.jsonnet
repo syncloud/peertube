@@ -135,7 +135,7 @@ local build(arch, test_ui, dind) = [{
          },
      {
            name: 'selenium-video',
-           image: 'selenium/video:ffmpeg-4.3.1-20220208',
+           image: 'selenium/video:ffmpeg-6.1.1-20240517',
            detach: true,
            environment: {
              DISPLAY_CONTAINER_NAME: 'selenium',
