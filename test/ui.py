@@ -12,7 +12,7 @@ TMP_DIR = '/tmp/syncloud/ui'
 
 
 @pytest.fixture(scope="session")
-def module_setup(request, device, artifact_dir, ui_mode):
+def module_setup(request, device, artifact_dir, ui_mode, driver, selenium):
     def module_teardown():
         device.activated()
         device.run_ssh('mkdir -p {0}'.format(TMP_DIR), throw=False)
@@ -21,6 +21,8 @@ def module_setup(request, device, artifact_dir, ui_mode):
         device.scp_from_device('{0}/*'.format(TMP_DIR), join(artifact_dir, 'log'))
         check_output('cp /videos/* {0}'.format(artifact_dir), shell=True)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
+        selenium.log()
+        driver.quit()
 
     request.addfinalizer(module_teardown)
 
@@ -56,7 +58,7 @@ def test_publish_video(selenium):
     selenium.driver.execute_script("Object.values(arguments[0].attributes).filter(({name}) => name.startsWith('_ngcontent')).forEach(({name}) => arguments[0].removeAttribute(name))", file)
     selenium.screenshot('file')
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
-    publish = "//button[text()='Publish!']"
+    publish = "//selenium//span[text()='Publish']"
     selenium.clickable_by(By.XPATH, publish)
     selenium.find_by_xpath(publish).click()
     selenium.find_by_xpath("//*[text()='test video']")
@@ -64,8 +66,3 @@ def test_publish_video(selenium):
     assert not selenium.exists_by(By.XPATH, "//span[contains(.,'Error processing')]")
     selenium.screenshot('publish-video')
 
-
-def test_teardown(driver):
-    #record more video
-    time.sleep(10)
-    driver.quit()
