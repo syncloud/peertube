@@ -1,4 +1,5 @@
 import pytest
+import time
 from os.path import dirname, join
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -64,4 +65,6 @@ def test_publish_video(selenium):
 
 
 def test_teardown(driver):
+    #record more video
+    time.sleep(10)
     driver.quit()
