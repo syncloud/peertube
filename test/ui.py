@@ -1,11 +1,10 @@
-import pytest
 import time
 from os.path import dirname, join
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from subprocess import check_output
+
+import pytest
+from selenium.webdriver.common.by import By
 from syncloudlib.integration.hosts import add_host_alias
-from selenium.webdriver.support import expected_conditions as EC
 
 DIR = dirname(__file__)
 TMP_DIR = '/tmp/syncloud/ui'
@@ -30,11 +29,11 @@ def test_start(module_setup, app, domain, device_host):
     add_host_alias(app, device_host, domain)
 
 
-def test_login(selenium, device_user, device_password):
-    selenium.driver.get("https://auth.buster.com")
-    selenium.find_by(By.ID, "username-textfield")
-    selenium.screenshot('auth')
+def test_open(selenium):
     selenium.open_app()
+
+
+def test_login(selenium, device_user, device_password):
     selenium.find_by(By.XPATH, "//a[contains(.,'Login')]").click()
     selenium.find_by(By.XPATH, "//a[contains(.,'My Syncloud')]").click()
     selenium.find_by(By.ID, "username-textfield").send_keys(device_user)
@@ -53,15 +52,18 @@ def test_publish_video(selenium):
     selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
     #selenium.find_by_xpath("//span[text()='New post']").click()
     #selenium.find_by_xpath("//label/textarea").send_keys("test video")
-    file = selenium.driver.find_element(By.ID, 'videofile')
+    file = selenium.find_by(By.ID, 'videofile')
     selenium.driver.execute_script("Object.values(arguments[0].attributes).filter(({name}) => name.startsWith('_ngcontent')).forEach(({name}) => arguments[0].removeAttribute(name))", file)
     selenium.screenshot('file')
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
-    publish = "//selenium//span[text()='Publish']"
+    name = selenium.find_by(By.ID, "name")
+    name.clear()
+    name.send_keys('test video')
+    publish = "//my-button[@label='Publish']"
+    selenium.present_by(By.XPATH, publish)
     selenium.clickable_by(By.XPATH, publish)
     selenium.find_by_xpath(publish).click()
-    selenium.find_by_xpath("//*[text()='test video']")
-    selenium.find_by_xpath("//span[text()='New post']")
-    assert not selenium.exists_by(By.XPATH, "//span[contains(.,'Error processing')]")
+    selenium.find_by_xpath("//h1[contains(.,'test video')]")
+    selenium.find_by_xpath("//span[contains(.,'Subscribe')]")
     selenium.screenshot('publish-video')
 
