@@ -46,6 +46,7 @@ def test_login(selenium, device_user, device_password):
     selenium.find_by(By.CLASS_NAME, "publish-button-label")
     selenium.screenshot('main')
 
+
 def test_publish_video(selenium):
     selenium.find_by(By.XPATH, "//input[@type='button' and @value='Close']").click()
     selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
