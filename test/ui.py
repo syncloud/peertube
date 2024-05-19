@@ -57,7 +57,7 @@ def test_publish_video(selenium):
     selenium.screenshot('file')
     file.send_keys(join(DIR, 'videos', 'test.mp4'))
     publish = "//button[text()='Publish!']"
-    selenium.clickable_by((By.XPATH, publish))
+    selenium.clickable_by(By.XPATH, publish)
     selenium.find_by_xpath(publish).click()
     selenium.find_by_xpath("//*[text()='test video']")
     selenium.find_by_xpath("//span[text()='New post']")
