@@ -102,6 +102,10 @@ def test_index_after_upgrade(app_domain):
     wait_for_rest(requests.session(), "https://{0}".format(app_domain), 200, 10)
 
 
+def test_access_change(device, artifact_dir):
+    device.run_ssh("snap run peertube.access-change")
+
+
 def test_backup(device, artifact_dir):
     device.run_ssh("snap run platform.cli backup create peertube")
     response = device.run_ssh("snap run platform.cli backup list")
@@ -110,10 +114,6 @@ def test_backup(device, artifact_dir):
     backup = json.loads(response)[0]
     device.run_ssh('tar tvf {0}/{1}'.format(backup['path'], backup['file']))
     device.run_ssh("snap run platform.cli backup restore {0}".format(backup['file']))
-
-
-def test_access_change(device, artifact_dir):
-    device.run_ssh("snap run peertube.access-change")
 
 
 def test_npm(device, artifact_dir):
