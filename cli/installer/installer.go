@@ -145,6 +145,8 @@ func (i *Installer) registerOIDC() error {
 	settings += `"mail-property": "email",`
 	settings += `"auth-display-name": "My Syncloud",`
 	settings += `"username-property": "preferred_username",`
+	settings += `"role-property": "group",`
+	settings += `"group-property": "group",`
 	settings += `"signature-algorithm": "RS256"`
 	settings += `}' where name = 'auth-openid-connect'`
 	err = i.database.Execute(App, settings)
