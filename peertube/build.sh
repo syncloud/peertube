@@ -24,6 +24,6 @@ ldd ${BUILD_DIR}/usr/bin/ffmpeg
 wget https://framagit.org/framasoft/peertube/official-plugins/-/archive/master/official-plugins-master.tar.gz
 tar xf official-plugins-master.tar.gz
 mkdir ${BUILD_DIR}/app/plugins
-sed 's/role = parseInt\(.*\)/role = roleToParse == "syncloud" ? 0: 2/' official-plugins-master/peertube-plugin-auth-openid-connect/main.js
+sed -i 's/role = parseInt\(.*\)/role = roleToParse == "syncloud" ? 0: 2/' official-plugins-master/peertube-plugin-auth-openid-connect/main.js
 cp -r official-plugins-master/peertube-plugin-auth-openid-connect ${BUILD_DIR}/app/plugins
 
