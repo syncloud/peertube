@@ -138,15 +138,15 @@ func (i *Installer) registerOIDC() error {
 	}
 
 	settings := `update plugin set settings = '{`
-	settings += `"scope": "openid email profile",`
+	settings += `"scope": "openid email profile groups",`
 	settings += fmt.Sprintf(`"client-id": "%s",`, App)
 	settings += fmt.Sprintf(`"discover-url": "%s",`, authUrl)
 	settings += fmt.Sprintf(`"client-secret": "%s",`, password)
 	settings += `"mail-property": "email",`
 	settings += `"auth-display-name": "My Syncloud",`
 	settings += `"username-property": "preferred_username",`
-	settings += `"role-property": "group",`
-	settings += `"group-property": "group",`
+	settings += `"role-property": "groups",`
+	settings += `"group-property": "groups",`
 	settings += `"signature-algorithm": "RS256"`
 	settings += `}' where name = 'auth-openid-connect'`
 	err = i.database.Execute(App, settings)
