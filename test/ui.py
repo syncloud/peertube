@@ -47,6 +47,7 @@ def test_login(selenium, device_user, device_password):
 
 def test_publish_video(selenium):
     selenium.find_by(By.XPATH, "//input[@type='button' and @value='Remind me later']").click()
+    selenium.find_by(By.XPATH, "//a[contains(.,'Administration')]")
     selenium.find_by(By.CLASS_NAME, "publish-button-label").click()
     file = selenium.find_by(By.ID, 'videofile')
     selenium.driver.execute_script("Object.values(arguments[0].attributes).filter(({name}) => name.startsWith('_ngcontent')).forEach(({name}) => arguments[0].removeAttribute(name))", file)
