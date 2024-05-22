@@ -926,12 +926,12 @@ search:
   # If you do not enable remote_uri search for anonymous user, your instance will redirect the user on the origin instance
   # instead of loading the video locally
   search_index:
-    enabled: false
+    enabled: true
     # URL of the search index, that should use the same search API and routes
     # than PeerTube: https://docs.joinpeertube.org/api-rest-reference.html
     # You should deploy your own with https://framagit.org/framasoft/peertube/search-index,
     # and can use https://search.joinpeertube.org/ for tests, but keep in mind the latter is an unmoderated search index
-    url: ''
+    url: 'https://search.joinpeertube.org/'
     # You can disable local search in the client, so users only use the search index
     disable_local_search: false
     # If you did not disable local search in the client, you can decide to use the search index by default
