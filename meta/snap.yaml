@@ -58,7 +58,7 @@ apps:
     command: bin/cli restore-post-start
 
 confinement: strict
-description: PeerTube
+description: Decentralized video platform
 grade: stable
 name: peertube
-summary: peertube
+summary: PeerTube
