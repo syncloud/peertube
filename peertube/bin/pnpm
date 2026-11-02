@@ -1,0 +1,10 @@
+#!/bin/bash -e
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
+export PATH=$PATH:${DIR}/bin
+export XDG_DATA_HOME=/var/snap/peertube/current/pnpm/data
+export XDG_CACHE_HOME=/var/snap/peertube/current/pnpm/cache
+export XDG_STATE_HOME=/var/snap/peertube/current/pnpm/state
+export XDG_CONFIG_HOME=/var/snap/peertube/current/pnpm/config
+LIBS=$(echo ${DIR}/lib/*-linux-gnu*)
+LIBS=$LIBS:$(echo ${DIR}/usr/lib/*-linux-gnu*)
+exec ${DIR}/lib/*-linux*/ld-*.so.* --library-path $LIBS ${DIR}/usr/local/lib/node_modules/pnpm/pnpm "$@"

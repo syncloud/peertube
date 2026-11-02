@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
@@ -10,6 +11,8 @@ import (
 	"go.uber.org/zap"
 	"time"
 
+	"net"
+	"net/http"
 	"os"
 	"path"
 )
@@ -19,6 +22,7 @@ const (
 	AppDir    = "/snap/peertube/current"
 	DataDir   = "/var/snap/peertube/current"
 	CommonDir = "/var/snap/peertube/common"
+	Socket    = "/var/snap/peertube/current/peertube.socket"
 )
 
 type Variables struct {
@@ -117,18 +121,18 @@ func (i *Installer) registerOIDC() error {
 		}
 	}
 
-	password, err := i.platformClient.RegisterOIDCClient(App, "/plugins/auth-openid-connect/router/code-cb", false, "client_secret_basic")
+	password, err := i.platformClient.RegisterOIDCClient(App, "/plugins/auth-openid-connect/router/code-cb", false, "client_secret_post")
 	if err != nil {
 		return err
 	}
 
-	err = i.executor.Run("snap",
-		"run", "peertube.node",
-		fmt.Sprintf("%s/peertube/app/dist/scripts/plugin/install.js", AppDir),
-		"-p", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
-	)
+	err = i.waitForWeb()
 	if err != nil {
-		i.logger.Error("failed to install plugin", zap.Error(err))
+		return err
+	}
+
+	err = i.installOIDCPlugin()
+	if err != nil {
 		return err
 	}
 
@@ -155,6 +159,52 @@ func (i *Installer) registerOIDC() error {
 	}
 
 	return nil
+}
+
+func (i *Installer) waitForWeb() error {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", Socket)
+			},
+		},
+	}
+	attempts := 30
+	for attempt := 1; attempt <= attempts; attempt++ {
+		resp, err := client.Get("http://localhost/api/v1/config")
+		if err == nil {
+			_ = resp.Body.Close()
+			if resp.StatusCode < 500 {
+				i.logger.Info("web is ready", zap.Int("status", resp.StatusCode))
+				return nil
+			}
+			err = fmt.Errorf("status %d", resp.StatusCode)
+		}
+		i.logger.Info("waiting for web", zap.Int("attempt", attempt), zap.Error(err))
+		time.Sleep(10 * time.Second)
+	}
+	return fmt.Errorf("web is not ready after %d attempts", attempts)
+}
+
+func (i *Installer) installOIDCPlugin() error {
+	attempts := 3
+	var err error
+	for attempt := 1; attempt <= attempts; attempt++ {
+		err = i.executor.RunInDir(fmt.Sprintf("%s/peertube/app", AppDir), "snap",
+			"run", "peertube.node",
+			fmt.Sprintf("%s/peertube/app/dist/scripts/plugin/install.js", AppDir),
+			"-p", fmt.Sprintf("%s/peertube/app/plugins/peertube-plugin-auth-openid-connect", AppDir),
+		)
+		if err == nil {
+			return nil
+		}
+		i.logger.Error("failed to install plugin", zap.Int("attempt", attempt), zap.Error(err))
+		if attempt < attempts {
+			time.Sleep(10 * time.Second)
+		}
+	}
+	return err
 }
 
 func (i *Installer) IsInstalled() bool {
@@ -288,6 +338,10 @@ func (i *Installer) StorageChange() error {
 	if err != nil {
 		return err
 	}
+	err = linkYtDlp(path.Join(storageDir, "bin", "yt-dlp"))
+	if err != nil {
+		return err
+	}
 	err = linux.Chown(storageDir, App)
 	if err != nil {
 		return err
@@ -387,6 +441,14 @@ func (i *Installer) createMissingDirs(dirs ...string) error {
 		}
 	}
 	return nil
+}
+
+func linkYtDlp(link string) error {
+	err := os.Remove(link)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return os.Symlink(path.Join(AppDir, "peertube", "yt-dlp", "yt-dlp"), link)
 }
 
 func createMissingDir(dir string) error {

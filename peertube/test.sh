@@ -10,3 +10,5 @@ ldd ${BUILD_DIR}/usr/bin/ffmpeg
 
 $BUILD_DIR/bin/ffmpeg --help
 $BUILD_DIR/bin/ffprobe --help
+$BUILD_DIR/bin/pnpm --version
+$BUILD_DIR/yt-dlp/yt-dlp --version

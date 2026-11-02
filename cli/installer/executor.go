@@ -17,8 +17,13 @@ func NewExecutor(logger *zap.Logger) *Executor {
 }
 
 func (e *Executor) Run(app string, args ...string) error {
+	return e.RunInDir("", app, args...)
+}
+
+func (e *Executor) RunInDir(dir string, app string, args ...string) error {
 	cmd := exec.Command(app, args...)
-	e.logger.Info("executing", zap.String("cmd", cmd.String()))
+	cmd.Dir = dir
+	e.logger.Info("executing", zap.String("cmd", cmd.String()), zap.String("dir", dir))
 	out, err := cmd.CombinedOutput()
 	e.logger.Info("command output")
 	for _, line := range strings.Split(string(out), "\n") {

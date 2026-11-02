@@ -14,8 +14,7 @@ ARCH=$(dpkg --print-architecture)
 
 SNAP_DIR=${DIR}/build/snap
 
-apt update
-apt -y install squashfs-tools wget
+${DIR}/apt.sh squashfs-tools
 
 cp -r ${DIR}/bin ${SNAP_DIR}
 cp -r ${DIR}/config ${SNAP_DIR}

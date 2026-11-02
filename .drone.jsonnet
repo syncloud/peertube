@@ -1,15 +1,20 @@
 local name = 'peertube';
-local browser = 'chrome';
-local version = '6.1.0';
+local version = '8.3.2';
 local nginx = '1.24.0';
-local postgresql = "15-bullseye";
-local redis = "7.0.15";
-local node = "18-bookworm-slim";
-local platform = '22.02';
-local selenium = '4.21.0-20240517';
+local postgresql = '15-bullseye';
+local redis = '7.0.15';
+local platform = '26.10.01';
+local golang = '1.25';
+local python = '3.12-slim-bookworm';
+local debian = 'bookworm-slim';
+local playwright = 'mcr.microsoft.com/playwright:v1.59.1-jammy';
 local store_publisher = 'stable-346';
+local distro_default = 'bookworm';
+local distros = ['bookworm', 'buster'];
 
-local build(arch, test_ui, dind) = [{
+local platform_image(distro) = 'syncloud/platform-' + distro + ':' + platform;
+
+local build(arch, test_ui) = [{
   kind: 'pipeline',
   type: 'docker',
   name: arch,
@@ -19,42 +24,46 @@ local build(arch, test_ui, dind) = [{
   },
   steps: [
     {
-      name: 'version',
-      image: 'debian:buster-slim',
+      name: 'cli',
+      image: 'golang:' + golang,
       commands: [
-        'echo $DRONE_BUILD_NUMBER > version',
+        './cli/build.sh',
       ],
     },
-             {
-                name: "redis",
-                image: "redis:" + redis,
-                commands: [
-                    "./redis/build.sh"
-                ]
-            },
-             {
-                name: "redis test",
-                image: 'syncloud/platform-buster-' + arch + ':' + platform,
-                commands: [
-                    "./redis/test.sh"
-                ]
-            },
-  {
-            name: "postgresql",
-            image: "postgres:" + postgresql,
-            commands: [
-                "./postgresql/build.sh"
-            ]
-           
-        },
-        {
-            name: "postgresql test",
-            image: 'syncloud/platform-buster-' + arch + ':' + platform,
-            commands: [
-                "./postgresql/test.sh"
-            ]
-        },
-
+    {
+      name: 'redis',
+      image: 'redis:' + redis,
+      commands: [
+        './redis/build.sh',
+      ],
+    },
+  ] + [
+    {
+      name: 'redis test ' + distro,
+      image: platform_image(distro),
+      commands: [
+        './redis/test.sh',
+      ],
+    }
+    for distro in distros
+  ] + [
+    {
+      name: 'postgresql',
+      image: 'postgres:' + postgresql,
+      commands: [
+        './postgresql/build.sh',
+      ],
+    },
+  ] + [
+    {
+      name: 'postgresql test ' + distro,
+      image: platform_image(distro),
+      commands: [
+        './postgresql/test.sh',
+      ],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'nginx',
       image: 'nginx:' + nginx,
@@ -62,121 +71,86 @@ local build(arch, test_ui, dind) = [{
         './nginx/build.sh',
       ],
     },
+  ] + [
     {
-      name: 'nginx test',
-      image: 'syncloud/platform-buster-' + arch + ':' + platform,
+      name: 'nginx test ' + distro,
+      image: platform_image(distro),
       commands: [
         './nginx/test.sh',
       ],
-    },
+    }
+    for distro in distros
+  ] + [
     {
       name: 'peertube',
-      image: "chocobozzz/peertube:v" + version + "-bookworm",
+      image: 'chocobozzz/peertube:v' + version + '-trixie',
       commands: [
         './peertube/build.sh',
       ],
     },
+  ] + [
     {
-      name: 'peertube test',
-      image: 'syncloud/platform-buster-' + arch + ':' + platform,
+      name: 'peertube test ' + distro,
+      image: platform_image(distro),
       commands: [
         './peertube/test.sh',
       ],
-    },
-    {
-      name: 'cli',
-      image: 'golang:1.20',
-      commands: [
-        'cd cli',
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/install ./cmd/install",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/configure ./cmd/configure",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/bin/cli ./cmd/cli",
-      ],
-    },
+    }
+    for distro in distros
+  ] + [
     {
       name: 'package',
-      image: 'debian:buster-slim',
+      image: 'debian:' + debian,
       commands: [
-        'VERSION=$(cat version)',
-        './package.sh ' + name + ' $VERSION ',
+        './package.sh ' + name + ' $DRONE_BUILD_NUMBER',
       ],
     },
+  ] + [
     {
-      name: 'test',
-      image: 'python:3.8-slim-buster',
+      name: 'test ' + distro,
+      image: 'python:' + python,
       commands: [
-        'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
-        'cd test',
-        './deps.sh',
-        'py.test -x -s test.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.buster.com --app=' + name + ' --arch=' + arch,
+        './ci/test.sh test.py ' + distro + ' ' + name,
       ],
-    },
+    }
+    for distro in distros
   ] + (if test_ui then [
-    {
-            name: "selenium",
-            image: "selenium/standalone-" + browser + ":" + selenium,
-            detach: true,
-            environment: {
-                SE_NODE_SESSION_TIMEOUT: "999999",
-                START_XVFB: "true"
-            },
-               volumes: [{
-                name: "shm",
-                path: "/dev/shm"
-            }],
-            commands: [
-                "cat /etc/hosts",
-                "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
-                "cat /etc/hosts",
-                "/opt/bin/entry_point.sh"
-            ]
-         },
-     {
-           name: 'selenium-video',
-           image: 'selenium/video:ffmpeg-6.1.1-20240517',
-           detach: true,
-           environment: {
-             DISPLAY_CONTAINER_NAME: 'selenium',
-             FILE_NAME: 'video.mkv',
-           },
-           volumes: [
-             {
-               name: 'shm',
-               path: '/dev/shm',
-             },
-             {
-               name: 'videos',
-               path: '/videos',
-             },
+         {
+           name: 'e2e',
+           image: playwright,
+           commands: [
+             './test/e2e/run.sh e2e specs/01-smoke.spec.ts',
            ],
          },
          {
-           name: 'test-ui',
-           image: 'python:3.8-slim-buster',
+           name: 'test-upgrade-prev',
+           image: 'python:' + python,
            commands: [
-             'cd test',
-             './deps.sh',
-             'py.test -x -s ui.py --distro=buster --ui-mode=desktop --domain=buster.com --device-host=' + name + '.buster.com --app=' + name + ' --browser-height=2000 --browser=' + browser,
+             './ci/test.sh upgrade_prev.py ' + distro_default + ' ' + name,
            ],
-           volumes: [{
-             name: 'videos',
-             path: '/videos',
-           }],
          },
-
+         {
+           name: 'e2e-before-upgrade',
+           image: playwright,
+           commands: [
+             './test/e2e/run.sh e2e-before-upgrade specs/02-pre-upgrade.spec.ts',
+           ],
+         },
+         {
+           name: 'test-upgrade',
+           image: 'python:' + python,
+           commands: [
+             './ci/test.sh upgrade.py ' + distro_default + ' ' + name,
+           ],
+         },
+         {
+           name: 'e2e-after-upgrade',
+           image: playwright,
+           commands: [
+             './test/e2e/run.sh e2e-after-upgrade specs/03-post-upgrade.spec.ts',
+           ],
+         },
        ] else []) + [
-    {
-      name: 'test-upgrade',
-      image: 'python:3.8-slim-buster',
-      commands: [
-        'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
-        'cd test',
-        './deps.sh',
-        'py.test -x -s upgrade.py --distro=buster --ui-mode=desktop --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.buster.com --app=' + name + ' --browser=' + browser,
-      ],
-    },
     {
       name: 'publish',
       image: 'syncloud/store-publisher:' + store_publisher,
@@ -193,86 +167,41 @@ local build(arch, test_ui, dind) = [{
       name: 'artifact',
       image: 'appleboy/drone-scp:1.6.4',
       settings: {
-        host: {
-          from_secret: 'artifact_host',
-        },
+        host: { from_secret: 'artifact_host' },
         username: 'artifact',
-        key: {
-          from_secret: 'artifact_key',
-        },
+        key: { from_secret: 'artifact_key' },
         timeout: '2m',
         command_timeout: '2m',
         target: '/home/artifact/repo/' + name + '/${DRONE_BUILD_NUMBER}-' + arch,
-        source: 'artifact/*',
+        source: ['artifact/*'],
         strip_components: 1,
       },
       when: {
         status: ['failure', 'success'],
-        event: ['push'],
       },
     },
   ],
   trigger: {
-    event: [
-      'push',
-    ],
+    event: ['push'],
   },
   services: [
     {
-      name: 'docker',
-      image: 'docker:' + dind,
+      name: name + '.' + distro + '.com',
+      image: platform_image(distro),
       privileged: true,
+      entrypoint: ['/bin/sh', '-c', "mkdir -p /etc/systemd/system/snapd.service.d && printf '[Service]\\nExecStartPost=/bin/sh -c \"/usr/bin/snap set system refresh.hold=2099-01-01T00:00:00Z\"\\n' > /etc/systemd/system/snapd.service.d/disable-refresh.conf && exec /sbin/init"],
       volumes: [
-        {
-          name: 'dockersock',
-          path: '/var/run',
-        },
+        { name: 'dbus', path: '/var/run/dbus' },
+        { name: 'dev', path: '/dev' },
       ],
-    },
-    {
-      name: name + '.buster.com',
-      image: 'syncloud/platform-buster-' + arch + ':' + platform,
-      privileged: true,
-      volumes: [
-        {
-          name: 'dbus',
-          path: '/var/run/dbus',
-        },
-        {
-          name: 'dev',
-          path: '/dev',
-        },
-      ],
-    },
+    }
+    for distro in distros
   ],
   volumes: [
-    {
-      name: 'dbus',
-      host: {
-        path: '/var/run/dbus',
-      },
-    },
-    {
-      name: 'dev',
-      host: {
-        path: '/dev',
-      },
-    },
-    {
-      name: 'shm',
-      temp: {},
-    },
-    {
-      name: 'dockersock',
-      temp: {},
-    },
-    {
-      name: 'videos',
-      temp: {},
-    },
+    { name: 'dbus', host: { path: '/var/run/dbus' } },
+    { name: 'dev', host: { path: '/dev' } },
   ],
 }];
 
-build('amd64', true, '20.10.21-dind') +
-build('arm64', false, '20.10.21-dind')
-
+build('amd64', true) +
+build('arm64', false)
