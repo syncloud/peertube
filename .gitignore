@@ -1,3 +1,10 @@
 .idea
 artifact
 __pycache__
+build
+node_modules
+test-results
+*.snap
+package.name
+peertube/package
+peertube/*.tgz

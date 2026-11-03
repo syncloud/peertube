@@ -3,31 +3,26 @@ apps:
     user: peertube
     command: bin/service.nginx.sh
     daemon: simple
-    plugs:
-    - network
-    - network-bind
     restart-condition: always
+    restart-delay: 10s
   peertube:
     user: peertube
     command: bin/service.peertube.sh
     daemon: simple
-    plugs:
-    - network
-    - network-bind
     restart-condition: always
+    restart-delay: 10s
   postgresql:
     user: peertube
     command: bin/service.postgresql.sh
     daemon: forking
-    plugs:
-      - network
-      - network-bind
     restart-condition: always
+    restart-delay: 10s
   redis:
     user: peertube
     daemon: simple
     command: bin/service.redis.sh
     restart-condition: always
+    restart-delay: 10s
     before: [peertube]
 
   npm:
@@ -35,7 +30,7 @@ apps:
 
   node:
     command: peertube/bin/node
- 
+
   psql:
     command: bin/psql.sh
 
@@ -57,7 +52,6 @@ apps:
   restore-post-start:
     command: bin/cli restore-post-start
 
-confinement: strict
 description: Decentralized video platform
 grade: stable
 name: peertube
