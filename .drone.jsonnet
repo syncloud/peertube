@@ -1,6 +1,6 @@
 local name = 'peertube';
 local version = '8.3.2';
-local nginx = '1.24.0';
+local nginx = '1.30.7';
 local postgresql = '15-bullseye';
 local redis = '7.0.15';
 local platform = '26.10.01';
